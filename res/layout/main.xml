@@ -6,22 +6,12 @@
 	<LinearLayout android:layout_width="fill_parent"
 		android:layout_height="wrap_content">
 
-		<Button android:layout_width="fill_parent"
-			android:layout_height="wrap_content" android:text="Fukung"
+		<Button android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:text="Pixilify"
 			android:layout_weight="0.2" android:id="@+id/randomFukung"
 			android:onClick="randomFukung" />
 
-		<Button android:layout_width="fill_parent"
-			android:layout_height="wrap_content" android:text="Fatpina"
-			android:layout_weight="0.2" android:id="@+id/randomFatpina"
-			android:onClick="randomFatpina" />
-		<Button android:layout_width="fill_parent"
-			android:layout_height="wrap_content" android:text="XKCD"
-			android:layout_weight="0.2" android:id="@+id/randomFatpina"
-			android:onClick="randomXKCD" />
-
 	</LinearLayout>
-
 
 	<WebView android:layout_width="fill_parent"
 		android:layout_height="wrap_content" android:id="@+id/webView" />

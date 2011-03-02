@@ -3,12 +3,14 @@ package com.grimmvarg.android;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UTFDataFormatException;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
@@ -51,6 +53,10 @@ public class WebFetcher extends Activity{
 	public String fetchWebImage(String url, String urlPattern) {
 		try {
 			httpClient = new DefaultHttpClient();
+			// Xkcd breaks if useragent is set
+			if(!url.contains("xkcd")){
+				httpClient.getParams().setParameter(CoreProtocolPNames.USER_AGENT, "Mozilla/5.0 (Linux; U; Android 1.1; en-gb; dream) AppleWebKit/525.10+ (KHTML, like Gecko) Version/3.0.4 Mobile Safari/523.12.2 – G1 Phone");
+			}
 			localContext = new BasicHttpContext();
 			httpGet = new HttpGet(url);
 			response = httpClient.execute(httpGet, localContext);

@@ -1,17 +1,28 @@
 package com.grimmvarg.android;
 
+import java.util.ArrayList;
+import java.util.EventObject;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
+import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebSettings.RenderPriority;
 import android.widget.Toast;
 
 public class Launch extends Activity {
@@ -19,6 +30,7 @@ public class Launch extends Activity {
 	Context context;
 	String imageURL;
 	ProgressDialog progressDialog;
+	ArrayList<String> urlArray;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -28,10 +40,29 @@ public class Launch extends Activity {
 		 if (savedInstanceState != null){
 		      ((WebView)findViewById(R.id.webView)).restoreState(savedInstanceState);
 		 }
+		 
+		 setUpWebView();
+		 //setUpWebSources();
+	}
 
+	private void setUpWebSources() {
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+		urlArray = new ArrayList<String>();
 		
+		if(settings.getBoolean("Fukung", false)){
+			
+		}
+		if(settings.getBoolean("Fatpina", false)){
+			
+		}
+		if(settings.getBoolean("XKCD", false)){
+			
+		}
+		
+	}
+
+	private void setUpWebView() {
 		webView = (WebView) findViewById(R.id.webView);
-        webView.getSettings().setBuiltInZoomControls(true);
         webView.setOnTouchListener(new OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
@@ -40,8 +71,15 @@ public class Launch extends Activity {
         });
         webView.setMinimumWidth(getWallpaperDesiredMinimumWidth());
         WebView.enablePlatformNotifications();
-        webView.getSettings().setJavaScriptEnabled(true);
-
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setJavaScriptCanOpenWindowsAutomatically(false);
+        webSettings.setPluginsEnabled(false);
+        webSettings.setSupportMultipleWindows(false);
+        webSettings.setRenderPriority(RenderPriority.HIGH);
+        webSettings.setBuiltInZoomControls(true);
+        webSettings.setSupportZoom(true);
+        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
 	}
 
 	private void setImage(String url) {
@@ -87,10 +125,7 @@ public class Launch extends Activity {
 	}
 	
 	public void showMessage(String message) {
-		CharSequence text = message;
-		int duration = Toast.LENGTH_SHORT;
-
-		Toast toast = Toast.makeText(Launch.this, text, duration);
+		Toast toast = Toast.makeText(Launch.this, message, Toast.LENGTH_SHORT);
 		toast.show();
 	}
 	
@@ -113,5 +148,6 @@ public class Launch extends Activity {
 	    }
 	    return true;
 	}
+
 	
 }
