@@ -63,6 +63,7 @@ public class Launch extends Activity {
 
 	private void setUpWebView() {
 		webView = (WebView) findViewById(R.id.webView);
+		webView.setBackgroundColor(0);
         webView.setOnTouchListener(new OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
@@ -72,26 +73,25 @@ public class Launch extends Activity {
         webView.setMinimumWidth(getWallpaperDesiredMinimumWidth());
         WebView.enablePlatformNotifications();
         WebSettings webSettings = webView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-        webSettings.setJavaScriptCanOpenWindowsAutomatically(false);
         webSettings.setPluginsEnabled(false);
-        webSettings.setSupportMultipleWindows(false);
-        webSettings.setRenderPriority(RenderPriority.HIGH);
+        webSettings.setRenderPriority(RenderPriority.LOW);
         webSettings.setBuiltInZoomControls(true);
         webSettings.setSupportZoom(true);
         webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+        webSettings.setCacheMode(webView.DRAWING_CACHE_QUALITY_AUTO;);
 	}
 
 	private void setImage(String url) {
 		webView.loadUrl(url);
 	}
 	
-	private void fetchRandomImage(String pageURL, String urlPattern){
+	private void fetchRandomImage(String pageURL, String oldBase, String newBase){
 		progressDialog = ProgressDialog.show(Launch.this, "", "Fetching image..", true);
 		Intent nextIntent = new Intent(Intent.ACTION_VIEW);
 		nextIntent.setClassName(this, WebFetcher.class.getName());
 		nextIntent.putExtra("com.grimmvarg.android.pixility.pageURL", pageURL);
-		nextIntent.putExtra("com.grimmvarg.android.pixility.urlPattern", urlPattern);
+		nextIntent.putExtra("com.grimmvarg.android.pixility.newBase", newBase);
+		nextIntent.putExtra("com.grimmvarg.android.pixility.oldBase", oldBase);
 		startActivityForResult(nextIntent, 1);
 	}
 	
@@ -101,7 +101,7 @@ public class Launch extends Activity {
 		if (resultCode == RESULT_OK && requestCode == 1) {
 			setImage(data.getExtras().getString("imageURL"));
 		}else {
-			showMessage("Sorry, I failed :(");
+			showMessage("Sry, I failed :( - Try again :D");
 		}
 		progressDialog.dismiss();
 	}
@@ -113,16 +113,16 @@ public class Launch extends Activity {
 
 	
 	public void randomFukung(View view) {
-		 fetchRandomImage("http://fukung.net/random", "http://media.fukung.net/images/");		
+		 fetchRandomImage("http://fukung.net", "http://fukung.net/v/", "http://media.fukung.net/images/");		
 	}
 	
-	public void randomFatpina(View view) {
-		fetchRandomImage("http://fatpita.net/random", "http://fatpita.net/images/");
-	}
-	
-	public void randomXKCD(View view) {
-		fetchRandomImage("http://dynamic.xkcd.com/random/mobile_comic/", "http://imgs.xkcd.com/comics/");
-	}
+//	public void randomFatpina(View view) {
+//		fetchRandomImage("http://fatpita.net", "http://fatpita.net/images");
+//	}
+//	
+//	public void randomXKCD(View view) {
+//		fetchRandomImage("http://dynamic.xkcd.com/random/mobile_comic", "http://imgs.xkcd.com/comics");
+//	}
 	
 	public void showMessage(String message) {
 		Toast toast = Toast.makeText(Launch.this, message, Toast.LENGTH_SHORT);
