@@ -1,6 +1,7 @@
 package com.grimmvarg.android;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EventObject;
 
 import android.app.Activity;
@@ -8,6 +9,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceManager;
@@ -23,83 +25,108 @@ import android.view.View.OnTouchListener;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebSettings.RenderPriority;
+import android.widget.TextView;
 import android.widget.Toast;
 
-public class Launch extends Activity {
-	WebView webView;
-	Context context;
-	String imageURL;
-	ProgressDialog progressDialog;
-	ArrayList<String> urlArray;
+public class Launch extends Activity implements OnSharedPreferenceChangeListener {
+	private WebView webView;
+	private boolean allowGif = false;
+	private ProgressDialog progressDialog;
+	private ArrayList<String> sourcesArray;
+	private String nowWatching = "";
+	private String imageURL;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		
-		 if (savedInstanceState != null){
-		      ((WebView)findViewById(R.id.webView)).restoreState(savedInstanceState);
-		 }
-		 
-		 setUpWebView();
-		 //setUpWebSources();
+		if (savedInstanceState != null){
+			((WebView)findViewById(R.id.webView)).restoreState(savedInstanceState);
+		}
+		
+		setUpWebView();
+
+	}
+	
+	@Override
+	public void onResume(){
+		super.onResume();
+		refreshWebSources();
 	}
 
-	private void setUpWebSources() {
+	private void refreshWebSources() {
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-		urlArray = new ArrayList<String>();
+		settings.registerOnSharedPreferenceChangeListener(this);
+		sourcesArray = new ArrayList<String>();
 		
 		if(settings.getBoolean("Fukung", false)){
-			
+			sourcesArray.add("Fukung");
 		}
-		if(settings.getBoolean("Fatpina", false)){
-			
+		if(settings.getBoolean("Fatpita", false)){
+			sourcesArray.add("Fatpita");
 		}
-		if(settings.getBoolean("XKCD", false)){
-			
+		if(settings.getBoolean("AllowGif", false)){
+			allowGif = true;
 		}
+		if(settings.getBoolean("MoonBuggy", false)){
+			sourcesArray.add("MoonBuggy");
+		}
+		if(settings.getBoolean("LolRandom", false)){
+			sourcesArray.add("LolRandom");
+		}
+		if(settings.getBoolean("FunCage", false)){
+			sourcesArray.add("FunCage");
+		}
+//		if(settings.getBoolean("LolPics", false)){
+//			sourcesArray.add("LolPics");
+//		}
 		
+		Collections.shuffle(sourcesArray);
 	}
-
+	
 	private void setUpWebView() {
 		webView = (WebView) findViewById(R.id.webView);
 		webView.setBackgroundColor(0);
-        webView.setOnTouchListener(new OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				return false;
-			}
-        });
         webView.setMinimumWidth(getWallpaperDesiredMinimumWidth());
+        //webView.clearCache(false);
         WebView.enablePlatformNotifications();
         WebSettings webSettings = webView.getSettings();
         webSettings.setPluginsEnabled(false);
         webSettings.setRenderPriority(RenderPriority.LOW);
         webSettings.setBuiltInZoomControls(true);
         webSettings.setSupportZoom(true);
-        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
-        webSettings.setCacheMode(webView.DRAWING_CACHE_QUALITY_AUTO;);
+        webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        webSettings.setJavaScriptCanOpenWindowsAutomatically(false);
 	}
 
 	private void setImage(String url) {
 		webView.loadUrl(url);
 	}
 	
-	private void fetchRandomImage(String pageURL, String oldBase, String newBase){
-		progressDialog = ProgressDialog.show(Launch.this, "", "Fetching image..", true);
-		Intent nextIntent = new Intent(Intent.ACTION_VIEW);
-		nextIntent.setClassName(this, WebFetcher.class.getName());
-		nextIntent.putExtra("com.grimmvarg.android.pixility.pageURL", pageURL);
-		nextIntent.putExtra("com.grimmvarg.android.pixility.newBase", newBase);
-		nextIntent.putExtra("com.grimmvarg.android.pixility.oldBase", oldBase);
-		startActivityForResult(nextIntent, 1);
+	public void fetchRandomImage(View view){
+		if(sourcesArray.isEmpty()){
+			showMessage("Please select sources in settings!");
+		}else {			
+			progressDialog = ProgressDialog.show(Launch.this, "", "Fetching image..", true);
+			Intent fetchImage = new Intent(Intent.ACTION_VIEW);
+			fetchImage.setClassName(this, WebFetcher.class.getName());
+			nowWatching = sourcesArray.get(0);
+			fetchImage.putExtra("com.grimmvarg.android.pixility.source", nowWatching);
+			fetchImage.putExtra("com.grimmvarg.android.pixility.gifAllowed", allowGif);
+			Collections.shuffle(sourcesArray);
+			
+			startActivityForResult(fetchImage, 1);
+		}
 	}
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		if (resultCode == RESULT_OK && requestCode == 1) {
-			setImage(data.getExtras().getString("imageURL"));
+			imageURL = data.getExtras().getString("imageURL");
+			setImage(imageURL);
+			((TextView)findViewById(R.id.nowShowing)).setText("Fetched from: " + nowWatching);
 		}else {
 			showMessage("Sry, I failed :( - Try again :D");
 		}
@@ -112,17 +139,7 @@ public class Launch extends Activity {
 	   }
 
 	
-	public void randomFukung(View view) {
-		 fetchRandomImage("http://fukung.net", "http://fukung.net/v/", "http://media.fukung.net/images/");		
-	}
-	
-//	public void randomFatpina(View view) {
-//		fetchRandomImage("http://fatpita.net", "http://fatpita.net/images");
-//	}
-//	
-//	public void randomXKCD(View view) {
-//		fetchRandomImage("http://dynamic.xkcd.com/random/mobile_comic", "http://imgs.xkcd.com/comics");
-//	}
+
 	
 	public void showMessage(String message) {
 		Toast toast = Toast.makeText(Launch.this, message, Toast.LENGTH_SHORT);
@@ -145,8 +162,28 @@ public class Launch extends Activity {
 	        case R.id.about_menuitem:
 	        	startActivity(new Intent(this, About.class));
 	        	break;
+	        case R.id.share_menuitem:
+	        	share();
+	        	break;
 	    }
 	    return true;
+	}
+	
+	public void share() {
+		 final Intent intent = new Intent(Intent.ACTION_SEND);
+
+		 intent.setType("text/plain");
+		 intent.putExtra(Intent.EXTRA_SUBJECT, "An image I found using Pixility app for android :)");
+		 intent.putExtra(Intent.EXTRA_TEXT, imageURL);
+
+		 startActivity(Intent.createChooser(intent, "Share"));
+	}
+
+	@Override
+	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
+			String key) {
+		refreshWebSources();
+		
 	}
 
 	

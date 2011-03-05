@@ -1,12 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-	<CheckBoxPreference android:key="XKCD"
-		android:title="XKCD" android:summary="Use pictures from XKCD"
-		android:defaultValue="true" />
+	<CheckBoxPreference android:key="AllowGif"
+		android:title="Allow Gif images" android:summary="Takes longer to load"
+		android:defaultValue="false" />
 	<CheckBoxPreference android:key="Fukung"
 		android:defaultValue="true" android:summary="Use pictures from Fukung"
 		android:title="Fukung" />
-	<CheckBoxPreference android:key="Fatpina"
-		android:title="Fatpina" android:summary="Use pictures from Fatpina"
+	<CheckBoxPreference android:key="Fatpita"
+		android:title="Fatpita" android:summary="Use pictures from Fatpita"
+		android:defaultValue="true" />
+	<CheckBoxPreference android:key="MoonBuggy"
+		android:title="MoonBuggy" android:summary="Use pictures from MoonBuggy"
 		android:defaultValue="false" />
+	<CheckBoxPreference android:key="LolRandom"
+		android:title="LolRandom" android:summary="Use pictures from LolRandom"
+		android:defaultValue="false" />
+	<CheckBoxPreference android:key="FunCage"
+		android:title="FunCage" android:summary="Use pictures from FunCage"
+		android:defaultValue="false" />
+	<!-- 
+	<CheckBoxPreference android:key="LolPics"
+		android:title="LolPics" android:summary="Use pictures from LolPics"
+		android:defaultValue="false" />
+	-->
 </PreferenceScreen>

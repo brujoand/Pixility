@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UTFDataFormatException;
+import java.security.PublicKey;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -31,26 +32,40 @@ public class WebFetcher extends Activity{
 	private HttpContext localContext;
 	private HttpGet httpGet;
 	private HttpResponse response;
-	private String result = "";
-	private String pageURL;
-	private String newBase;
-	private String oldBase;
+	private String source;
 	private boolean gifAllowed;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
+		String imageURL = "";
 		Intent callerIntent = getIntent();
-		pageURL = callerIntent.getStringExtra("com.grimmvarg.android.pixility.pageURL");
-		newBase = callerIntent.getStringExtra("com.grimmvarg.android.pixility.newBase");
-		oldBase = callerIntent.getStringExtra("com.grimmvarg.android.pixility.oldBase");
+		source = callerIntent.getStringExtra("com.grimmvarg.android.pixility.source");
 		gifAllowed = callerIntent.getBooleanExtra("com.grimmvarg.android.pixility.gifAllowed", false);
 		
-		String imageURL = fetchWebImage();
+		if(source.equals("Fukung")){
+			imageURL = fetchFukung();
+		}
+		else if(source.equals("Fatpita")){
+			imageURL = fetchFatpita();
+		}
+		else if(source.equals("MoonBuggy")){
+			imageURL = fetchMoonBuggy();
+		}
+		else if(source.equals("LolRandom")){
+			imageURL = fetchLolRandom();
+		}
+		else if(source.equals("FunCage")){
+			imageURL = fetchFunCage();
+		}
+//		else if(source.equals("LolPics")){
+//			imageURL = fetchLolPics();
+//		}
+
 		Intent data = new Intent();
 		
-		if(!result.equals("")){
+		if(!imageURL.equals("")){
 			data.putExtra("imageURL", imageURL);
 			setResult(RESULT_OK, data);
 		}else {
@@ -60,7 +75,84 @@ public class WebFetcher extends Activity{
 		finish();
 	}
 	
-	private String fetchWebImage() {
+	private String fetchFatpita() {
+		String pageURL = "http://fatpita.net";
+		String image = "";
+		try {
+			image = fetchImageUrlByRedirect(pageURL).split("=")[1];			
+		} catch (Exception e) {
+			return "";
+		}
+		return "http://fatpita.net/images/image ("+ image + ").jpg";
+	}
+
+	private String fetchFukung() {
+		String pageURL = "http://fukung.net";
+		String newBase = "http://media.fukung.net/images/";
+		String oldBase = "http://fukung.net/v/";
+		String image = fetchImageUrlByRedirect(pageURL);
+		return (pageURL + image).replace(oldBase, newBase);
+	}
+	
+	private String fetchMoonBuggy(){
+		String pageURL = "http://img.moonbuggy.org";
+		String urlPattern = "http://img2.moonbuggy.org/imgstore/";
+		String image = fetchImageUrlByParsing(pageURL, urlPattern);
+		for (String field : image.split("\"")) {
+			if(field.contains("http://")){
+				return field;
+			}
+		}
+		return "";
+	}
+	
+	private String fetchLolRandom(){
+		String pageURL = "http://www.lolrandom.com";
+		String urlPattern = "/imageSize.asp?Image=/images/funny/";
+		String image = fetchImageUrlByParsing(pageURL, urlPattern);
+		for (String field : image.split("'")) {
+			if(field.contains(urlPattern)){
+				try{
+					return pageURL + field.split("=")[1];
+				}
+				catch (Exception e) {
+					return "";
+				}
+			}
+		}
+		return "";
+	}
+	
+	private String fetchFunCage(){
+		String pageURL = "http://www.funcage.com";
+		String urlPattern = "/photos/";
+		String image = fetchImageUrlByParsing(pageURL, urlPattern);
+		for (String field : image.split("\"")) {
+			if(field.contains(urlPattern)){
+				if(field.contains("http://")){
+					return field;
+				}
+				return pageURL + field;
+			}
+		}
+		return "";
+	}
+	
+//	private String fetchLolPics(){
+//		String pageURL = "http://lolpics.se/";
+//		String urlPattern = ">Random<";
+//		String image = fetchImageUrlByParsing(pageURL, urlPattern);
+//		Log.v("----------------------------", image);
+//		try{
+//			return "http://lolpics.se/pics/" + image.split("Random</")[1].split("-")[0].split("/")[1] + ".jpg";
+//		}catch (Exception e) {
+//			// TODO: handle exception
+//		}
+//		return "";
+//	}
+
+	private String fetchImageUrlByRedirect(String pageURL) {
+		String result = "";
 		try {
 			httpClient = new DefaultHttpClient();
 			localContext = new BasicHttpContext();
@@ -68,14 +160,11 @@ public class WebFetcher extends Activity{
 			response = httpClient.execute(httpGet, localContext);
 			HttpUriRequest req = (HttpUriRequest) localContext.getAttribute(ExecutionContext.HTTP_REQUEST);
 
-			result = pageURL + req.getURI().toString();
-			result = result.replace(oldBase, newBase);
-			
-			Log.v("----------------------------------", result);
+			result =  req.getURI().toString();
 
 		} catch (ClientProtocolException e) {
 			Log.v("com.grimmvarg.android.pixility.WebFetcher.ClientProtocoll----------------------------------", e.toString());
-			return(fetchWebImage());
+			return(fetchImageUrlByRedirect(pageURL));
 		} catch (IllegalStateException e) {
 			Log.v("com.grimmvarg.android.pixility.WebFetcher.IllegalState", e.toString());
 		} catch (IOException e) {
@@ -83,7 +172,39 @@ public class WebFetcher extends Activity{
 		}
 		
 		if(result.contains(".gif") && !gifAllowed){
-			return this.fetchWebImage();
+			return this.fetchImageUrlByRedirect(pageURL);
+		}
+		
+		return result;
+	}
+	
+	private String fetchImageUrlByParsing(String pageURL, String urlPattern) {
+		String result = "";
+		try {
+			httpClient = new DefaultHttpClient();
+			localContext = new BasicHttpContext();
+			httpGet = new HttpGet(pageURL);
+			response = httpClient.execute(httpGet, localContext);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+            	if (line.contains(urlPattern)) {
+					result = line;
+				}
+            }
+
+		} catch (ClientProtocolException e) {
+			Log.v("com.grimmvarg.android.pixility.WebFetcher.ClientProtocoll----------------------------------", e.toString());
+			return(fetchImageUrlByRedirect(pageURL));
+		} catch (IllegalStateException e) {
+			Log.v("com.grimmvarg.android.pixility.WebFetcher.IllegalState", e.toString());
+		} catch (IOException e) {
+			Log.v("com.grimmvarg.android.pixility.WebFetcher.IO", e.toString());
+		}
+		
+		if(result.contains(".gif") && !gifAllowed){
+			return this.fetchImageUrlByRedirect(pageURL);
 		}
 		
 		return result;

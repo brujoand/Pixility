@@ -2,4 +2,5 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 <item android:id="@+id/settings_menuitem" android:title="Settings"></item>
 <item android:id="@+id/about_menuitem" android:title="About"></item>
+<item android:id="@+id/share_menuitem" android:title="Share"></item>
 </menu>
