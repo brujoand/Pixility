@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	<PreferenceCategory android:title="Application settings"/>
 	<CheckBoxPreference android:key="AllowGif"
 		android:title="Allow Gif images" android:summary="Takes longer to load"
-		android:defaultValue="false" />
+		android:defaultValue="false"/>
+	<CheckBoxPreference android:key="Fullscreen"
+		android:title="Run in fullscreen" android:summary="More room for pictures"
+		android:defaultValue="true" />
+	<PreferenceCategory android:title="Image sources"/>
 	<CheckBoxPreference android:key="Fukung"
 		android:defaultValue="true" android:summary="Use pictures from Fukung"
 		android:title="Fukung" />
