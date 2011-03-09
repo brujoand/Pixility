@@ -35,13 +35,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 public class WebFetcher extends Activity{
-	private HttpClient httpClient;
-	private HttpContext localContext;
-	private HttpGet httpGet;
-	private HttpResponse response;
 	private String source;
 	private boolean gifAllowed;
-	private final String filePath = "/data/data/com.grimmvarg.android.pixility/image.jpg";
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -70,9 +65,8 @@ public class WebFetcher extends Activity{
 		
 		Intent data = new Intent();
 		
-		if(!imageURL.equals("") ){//&& downloadFromUrl(imageURL, filePath)){
+		if(!imageURL.equals("")){
 			data.putExtra("imageURL", imageURL);
-//			data.putExtra("filePath", filePath);
 			setResult(RESULT_OK, data);				
 		}else {
 			setResult(RESULT_CANCELED);
@@ -147,6 +141,10 @@ public class WebFetcher extends Activity{
 
 	private String fetchImageUrlByRedirect(String pageURL) {
 		String result = "";
+		HttpClient httpClient;
+		HttpContext localContext;
+		HttpGet httpGet;
+		HttpResponse response;
 		try {
 			httpClient = new DefaultHttpClient();
 			localContext = new BasicHttpContext();
@@ -174,6 +172,10 @@ public class WebFetcher extends Activity{
 	
 	private String fetchImageUrlByParsing(String pageURL, String urlPattern) {
 		String result = "";
+		HttpClient httpClient;
+		HttpContext localContext;
+		HttpGet httpGet;
+		HttpResponse response;
 		try {
 			httpClient = new DefaultHttpClient();
 			localContext = new BasicHttpContext();

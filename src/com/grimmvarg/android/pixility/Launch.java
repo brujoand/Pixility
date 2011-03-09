@@ -10,6 +10,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.graphics.Picture;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -19,14 +20,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.View.OnClickListener;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebSettings.RenderPriority;
+import android.webkit.WebView.PictureListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class Launch extends Activity implements
-		OnSharedPreferenceChangeListener {
+public class Launch extends Activity implements OnSharedPreferenceChangeListener, OnClickListener {
 	private WebView webView;
 	private boolean allowGif = false;
 	private ProgressDialog progressDialog;
@@ -54,6 +56,8 @@ public class Launch extends Activity implements
 			((WebView) findViewById(R.id.webView))
 					.restoreState(savedInstanceState);
 		}
+		
+		((TextView) findViewById(R.id.nowShowing)).setOnClickListener(this);
 
 		setUpWebView();
 
@@ -100,15 +104,12 @@ public class Launch extends Activity implements
 		webView.setBackgroundColor(0);
 		webView.setDrawingCacheQuality(WebView.DRAWING_CACHE_QUALITY_LOW);
 		webView.setDrawingCacheEnabled(true);
-//		webView.setMinimumWidth(getWallpaperDesiredMinimumWidth());
-//		webView.clearCache(false);
 		WebView.enablePlatformNotifications();
 		WebSettings webSettings = webView.getSettings();
 		webSettings.setPluginsEnabled(false);
-		webSettings.setRenderPriority(RenderPriority.HIGH);
+		webSettings.setRenderPriority(RenderPriority.LOW);
 		webSettings.setBuiltInZoomControls(true);
 		webSettings.setSupportZoom(true);
-		//webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
 		webSettings.setJavaScriptCanOpenWindowsAutomatically(false);
 	}
 
@@ -116,7 +117,7 @@ public class Launch extends Activity implements
 		webView.loadUrl(url);
 	}
 
-	public void fetchRandomImage(View view) {
+	public void fetchRandomImage() {
 		if (sourcesArray.isEmpty()) {
 			showMessage("Please select sources in settings!");
 		} else {
@@ -137,8 +138,6 @@ public class Launch extends Activity implements
 		super.onActivityResult(requestCode, resultCode, data);
 		if (resultCode == RESULT_OK && requestCode == 1) {
 			imageURL = data.getExtras().getString("imageURL");
-//			String file = data.getExtras().getString("filePath");
-//			setImage("file://" + file);
 			setImage(imageURL);
 			((TextView) findViewById(R.id.nowShowing)).setText("Fetched from: " + nowWatching);
 		} else {
@@ -203,6 +202,12 @@ public class Launch extends Activity implements
 			String key) {
 		refreshWebSources();
 
+	}
+
+	@Override
+	public void onClick(View v) {
+		fetchRandomImage();
+		
 	}
 
 }
