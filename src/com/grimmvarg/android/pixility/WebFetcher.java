@@ -70,9 +70,9 @@ public class WebFetcher extends Activity{
 		
 		Intent data = new Intent();
 		
-		if(!imageURL.equals("") && downloadFromUrl(imageURL, filePath)){
+		if(!imageURL.equals("") ){//&& downloadFromUrl(imageURL, filePath)){
 			data.putExtra("imageURL", imageURL);
-			data.putExtra("filePath", filePath);
+//			data.putExtra("filePath", filePath);
 			setResult(RESULT_OK, data);				
 		}else {
 			setResult(RESULT_CANCELED);
@@ -216,7 +216,7 @@ public class WebFetcher extends Activity{
 			URLConnection ucon = url.openConnection();
 			InputStream is = ucon.getInputStream();
 			BufferedInputStream bis = new BufferedInputStream(is);
-			ByteArrayBuffer baf = new ByteArrayBuffer(50);
+			ByteArrayBuffer baf = new ByteArrayBuffer(75);
 			int current = 0;
 
 			while ((current = bis.read()) != -1) {

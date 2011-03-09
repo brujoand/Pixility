@@ -98,15 +98,17 @@ public class Launch extends Activity implements
 	private void setUpWebView() {
 		webView = (WebView) findViewById(R.id.webView);
 		webView.setBackgroundColor(0);
-		webView.setMinimumWidth(getWallpaperDesiredMinimumWidth());
-		// webView.clearCache(false);
+		webView.setDrawingCacheQuality(WebView.DRAWING_CACHE_QUALITY_LOW);
+		webView.setDrawingCacheEnabled(true);
+//		webView.setMinimumWidth(getWallpaperDesiredMinimumWidth());
+//		webView.clearCache(false);
 		WebView.enablePlatformNotifications();
 		WebSettings webSettings = webView.getSettings();
 		webSettings.setPluginsEnabled(false);
-		webSettings.setRenderPriority(RenderPriority.LOW);
+		webSettings.setRenderPriority(RenderPriority.HIGH);
 		webSettings.setBuiltInZoomControls(true);
 		webSettings.setSupportZoom(true);
-		webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+		//webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
 		webSettings.setJavaScriptCanOpenWindowsAutomatically(false);
 	}
 
@@ -118,10 +120,10 @@ public class Launch extends Activity implements
 		if (sourcesArray.isEmpty()) {
 			showMessage("Please select sources in settings!");
 		} else {
-			progressDialog = ProgressDialog.show(Launch.this, "","Fetching image..", true);
-			Intent fetchImage = new Intent(Intent.ACTION_VIEW);
-			fetchImage.setClassName(this, WebFetcher.class.getName());
 			nowWatching = sourcesArray.get(0);
+			Intent fetchImage = new Intent(Intent.ACTION_VIEW);
+			progressDialog = ProgressDialog.show(Launch.this, "","Fetching image from " + nowWatching, true);
+			fetchImage.setClassName(this, WebFetcher.class.getName());
 			fetchImage.putExtra("com.grimmvarg.android.pixility.pixility.source",nowWatching);
 			fetchImage.putExtra("com.grimmvarg.android.pixility.pixility.gifAllowed",allowGif);
 			Collections.shuffle(sourcesArray);
@@ -135,9 +137,9 @@ public class Launch extends Activity implements
 		super.onActivityResult(requestCode, resultCode, data);
 		if (resultCode == RESULT_OK && requestCode == 1) {
 			imageURL = data.getExtras().getString("imageURL");
-			String file = data.getExtras().getString("filePath");
-			Log.v("-----------------------------------", imageURL);
-			setImage("file://" + file);
+//			String file = data.getExtras().getString("filePath");
+//			setImage("file://" + file);
+			setImage(imageURL);
 			((TextView) findViewById(R.id.nowShowing)).setText("Fetched from: " + nowWatching);
 		} else {
 			showMessage("Sry, I failed :( - Try again :D");

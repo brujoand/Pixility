@@ -6,14 +6,14 @@
 		android:defaultValue="false"/>
 	<CheckBoxPreference android:key="Fullscreen"
 		android:title="Run in fullscreen" android:summary="More room for pictures"
-		android:defaultValue="true" />
+		android:defaultValue="false" />
 	<PreferenceCategory android:title="Image sources"/>
 	<CheckBoxPreference android:key="Fukung"
-		android:defaultValue="true" android:summary="Use pictures from Fukung"
+		android:defaultValue="false" android:summary="Use pictures from Fukung"
 		android:title="Fukung" />
 	<CheckBoxPreference android:key="Fatpita"
 		android:title="Fatpita" android:summary="Use pictures from Fatpita"
-		android:defaultValue="true" />
+		android:defaultValue="false" />
 	<CheckBoxPreference android:key="MoonBuggy"
 		android:title="MoonBuggy" android:summary="Use pictures from MoonBuggy"
 		android:defaultValue="false" />
