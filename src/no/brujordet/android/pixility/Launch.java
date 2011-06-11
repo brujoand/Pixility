@@ -33,6 +33,7 @@ public class Launch extends Activity implements OnSharedPreferenceChangeListener
 	private String imageURL;
 	private boolean useFullscreen;
 	SharedPreferences settings;
+	TextView textView;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -47,13 +48,15 @@ public class Launch extends Activity implements OnSharedPreferenceChangeListener
 		}
 
 		setContentView(R.layout.main);
+		textView = (TextView) findViewById(R.id.nowShowing);
 
 		if (savedInstanceState != null) {
 			((WebView) findViewById(R.id.webView))
 					.restoreState(savedInstanceState);
 		}
 		
-		((TextView) findViewById(R.id.nowShowing)).setOnClickListener(this);
+		textView.setOnClickListener(this);
+//		textView.setBackgroundDrawable("#ff000000");
 
 		setUpWebView();
 
