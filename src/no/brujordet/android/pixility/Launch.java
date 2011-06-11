@@ -24,6 +24,7 @@ import android.webkit.WebSettings.ZoomDensity;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ZoomControls;
 
 import com.google.ads.AdRequest;
 import com.google.ads.AdSize;
@@ -56,8 +57,7 @@ public class Launch extends Activity implements OnSharedPreferenceChangeListener
 		textView = (TextView) findViewById(R.id.nowShowing);
 
 		if (savedInstanceState != null) {
-			((WebView) findViewById(R.id.webView))
-					.restoreState(savedInstanceState);
+			webView.restoreState(savedInstanceState);
 		}
 		
 		textView.setOnClickListener(this);;
@@ -122,6 +122,7 @@ public class Launch extends Activity implements OnSharedPreferenceChangeListener
 		webSettings.setBuiltInZoomControls(true);
 		webSettings.setSupportZoom(true);
 		webSettings.setJavaScriptCanOpenWindowsAutomatically(false);
+
 	}
 
 	private void setImage(String url) {
