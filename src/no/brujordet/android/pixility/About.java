@@ -1,5 +1,5 @@
-package com.grimmvarg.android;
-import com.grimmvarg.android.R;
+package no.brujordet.android.pixility;
+import no.brujordet.android.pixility.R;
 
 import android.app.Activity;
 import android.os.Bundle;

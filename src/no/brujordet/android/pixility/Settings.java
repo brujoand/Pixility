@@ -1,8 +1,5 @@
-package com.grimmvarg.android.pixility;
+package no.brujordet.android.pixility;
 
-import com.grimmvarg.android.pixility.R;
-
-import android.app.Activity;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 

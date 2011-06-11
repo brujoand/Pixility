@@ -20,9 +20,6 @@
 	<CheckBoxPreference android:key="LolRandom"
 		android:title="LolRandom" android:summary="Use pictures from LolRandom"
 		android:defaultValue="false" />
-	<CheckBoxPreference android:key="FunCage"
-		android:title="FunCage" android:summary="Use pictures from FunCage"
-		android:defaultValue="false" />
 	<!-- 
 	<CheckBoxPreference android:key="LolPics"
 		android:title="LolPics" android:summary="Use pictures from LolPics"

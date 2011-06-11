@@ -1,37 +1,32 @@
-package com.grimmvarg.android;
+package no.brujordet.android.pixility;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UTFDataFormatException;
-import java.security.PublicKey;
+import java.net.URL;
+import java.net.URLConnection;
 
-import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.ByteArrayBuffer;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 public class WebFetcher extends Activity{
-	private HttpClient httpClient;
-	private HttpContext localContext;
-	private HttpGet httpGet;
-	private HttpResponse response;
 	private String source;
 	private boolean gifAllowed;
 	
@@ -41,8 +36,8 @@ public class WebFetcher extends Activity{
 		
 		String imageURL = "";
 		Intent callerIntent = getIntent();
-		source = callerIntent.getStringExtra("com.grimmvarg.android.pixility.source");
-		gifAllowed = callerIntent.getBooleanExtra("com.grimmvarg.android.pixility.gifAllowed", false);
+		source = callerIntent.getStringExtra("no.brujordet.android.pixility.pixility.source");
+		gifAllowed = callerIntent.getBooleanExtra("no.brujordet.android.pixility.pixility.gifAllowed", false);
 		
 		if(source.equals("Fukung")){
 			imageURL = fetchFukung();
@@ -59,15 +54,12 @@ public class WebFetcher extends Activity{
 		else if(source.equals("FunCage")){
 			imageURL = fetchFunCage();
 		}
-//		else if(source.equals("LolPics")){
-//			imageURL = fetchLolPics();
-//		}
-
+		
 		Intent data = new Intent();
 		
 		if(!imageURL.equals("")){
 			data.putExtra("imageURL", imageURL);
-			setResult(RESULT_OK, data);
+			setResult(RESULT_OK, data);				
 		}else {
 			setResult(RESULT_CANCELED);
 		}
@@ -83,7 +75,7 @@ public class WebFetcher extends Activity{
 		} catch (Exception e) {
 			return "";
 		}
-		return "http://fatpita.net/images/image ("+ image + ").jpg";
+		return "http://fatpita.net/images/image%20("+ image + ").jpg";
 	}
 
 	private String fetchFukung() {
@@ -137,22 +129,14 @@ public class WebFetcher extends Activity{
 		}
 		return "";
 	}
-	
-//	private String fetchLolPics(){
-//		String pageURL = "http://lolpics.se/";
-//		String urlPattern = ">Random<";
-//		String image = fetchImageUrlByParsing(pageURL, urlPattern);
-//		Log.v("----------------------------", image);
-//		try{
-//			return "http://lolpics.se/pics/" + image.split("Random</")[1].split("-")[0].split("/")[1] + ".jpg";
-//		}catch (Exception e) {
-//			// TODO: handle exception
-//		}
-//		return "";
-//	}
+
 
 	private String fetchImageUrlByRedirect(String pageURL) {
 		String result = "";
+		HttpClient httpClient;
+		HttpContext localContext;
+		HttpGet httpGet;
+		HttpResponse response;
 		try {
 			httpClient = new DefaultHttpClient();
 			localContext = new BasicHttpContext();
@@ -163,12 +147,12 @@ public class WebFetcher extends Activity{
 			result =  req.getURI().toString();
 
 		} catch (ClientProtocolException e) {
-			Log.v("com.grimmvarg.android.pixility.WebFetcher.ClientProtocoll----------------------------------", e.toString());
+			Log.v("no.brujordet.android.pixility.pixility.WebFetcher.ClientProtocoll----------------------------------", e.toString());
 			return(fetchImageUrlByRedirect(pageURL));
 		} catch (IllegalStateException e) {
-			Log.v("com.grimmvarg.android.pixility.WebFetcher.IllegalState", e.toString());
+			Log.v("no.brujordet.android.pixility.pixility.WebFetcher.IllegalState", e.toString());
 		} catch (IOException e) {
-			Log.v("com.grimmvarg.android.pixility.WebFetcher.IO", e.toString());
+			Log.v("no.brujordet.android.pixility.pixility.WebFetcher.IO", e.toString());
 		}
 		
 		if(result.contains(".gif") && !gifAllowed){
@@ -180,6 +164,10 @@ public class WebFetcher extends Activity{
 	
 	private String fetchImageUrlByParsing(String pageURL, String urlPattern) {
 		String result = "";
+		HttpClient httpClient;
+		HttpContext localContext;
+		HttpGet httpGet;
+		HttpResponse response;
 		try {
 			httpClient = new DefaultHttpClient();
 			localContext = new BasicHttpContext();
@@ -195,12 +183,12 @@ public class WebFetcher extends Activity{
             }
 
 		} catch (ClientProtocolException e) {
-			Log.v("com.grimmvarg.android.pixility.WebFetcher.ClientProtocoll----------------------------------", e.toString());
+			Log.v("no.brujordet.android.pixility.pixility.WebFetcher.ClientProtocoll----------------------------------", e.toString());
 			return(fetchImageUrlByRedirect(pageURL));
 		} catch (IllegalStateException e) {
-			Log.v("com.grimmvarg.android.pixility.WebFetcher.IllegalState", e.toString());
+			Log.v("no.brujordet.android.pixility.pixility.WebFetcher.IllegalState", e.toString());
 		} catch (IOException e) {
-			Log.v("com.grimmvarg.android.pixility.WebFetcher.IO", e.toString());
+			Log.v("no.brujordet.android.pixility.pixility.WebFetcher.IO", e.toString());
 		}
 		
 		if(result.contains(".gif") && !gifAllowed){
@@ -208,5 +196,38 @@ public class WebFetcher extends Activity{
 		}
 		
 		return result;
+	}
+	
+	public boolean downloadFromUrl(String imageURL, String fileName) {
+
+		try {
+			File file = new File(fileName);
+			URL url = new URL(imageURL);
+			long startTime = System.currentTimeMillis();
+			
+			/* Open a connection to that URL. */
+
+			URLConnection ucon = url.openConnection();
+			InputStream is = ucon.getInputStream();
+			BufferedInputStream bis = new BufferedInputStream(is);
+			ByteArrayBuffer baf = new ByteArrayBuffer(75);
+			int current = 0;
+
+			while ((current = bis.read()) != -1) {
+				baf.append((byte) current);
+			}
+
+			/* Convert the Bytes read to a String. */
+
+			FileOutputStream fos = new FileOutputStream(file);
+			fos.write(baf.toByteArray());
+			fos.close();
+
+		} catch (IOException e) {
+			Log.v("ImageManager", "Error: " + e);
+			return false;
+		}
+		
+		return true;
 	}
 }

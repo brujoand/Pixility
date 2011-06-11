@@ -1,12 +1,10 @@
-package com.grimmvarg.android;
+package no.brujordet.android.pixility;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
-import android.R.bool;
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.app.backup.RestoreObserver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -18,15 +16,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.View.OnClickListener;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebSettings.RenderPriority;
-import android.widget.ImageButton;
+import android.webkit.WebSettings.ZoomDensity;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class Launch extends Activity implements
-		OnSharedPreferenceChangeListener {
+public class Launch extends Activity implements OnSharedPreferenceChangeListener, OnClickListener {
 	private WebView webView;
 	private boolean allowGif = false;
 	private ProgressDialog progressDialog;
@@ -54,6 +52,8 @@ public class Launch extends Activity implements
 			((WebView) findViewById(R.id.webView))
 					.restoreState(savedInstanceState);
 		}
+		
+		((TextView) findViewById(R.id.nowShowing)).setOnClickListener(this);
 
 		setUpWebView();
 
@@ -63,7 +63,7 @@ public class Launch extends Activity implements
 	public void onResume() {
 		super.onResume();
 		refreshWebSources();
-		if(useFullscreen != settings.getBoolean("Fullscreen", true)){
+		if (useFullscreen != settings.getBoolean("Fullscreen", true)) {
 			useFullscreen = !useFullscreen;
 			restart();
 		}
@@ -90,26 +90,22 @@ public class Launch extends Activity implements
 		if (settings.getBoolean("FunCage", false)) {
 			sourcesArray.add("FunCage");
 		}
-		// if(settings.getBoolean("LolPics", false)){
-		// sourcesArray.add("LolPics");
-		// }
-		
+
 		Collections.shuffle(sourcesArray);
-		
+
 	}
 
 	private void setUpWebView() {
 		webView = (WebView) findViewById(R.id.webView);
 		webView.setBackgroundColor(0);
-		webView.setMinimumWidth(getWallpaperDesiredMinimumWidth());
-		// webView.clearCache(false);
+		webView.setDrawingCacheQuality(WebView.DRAWING_CACHE_QUALITY_LOW);
+		webView.setDrawingCacheEnabled(true);
 		WebView.enablePlatformNotifications();
 		WebSettings webSettings = webView.getSettings();
 		webSettings.setPluginsEnabled(false);
 		webSettings.setRenderPriority(RenderPriority.LOW);
 		webSettings.setBuiltInZoomControls(true);
 		webSettings.setSupportZoom(true);
-		webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
 		webSettings.setJavaScriptCanOpenWindowsAutomatically(false);
 	}
 
@@ -117,19 +113,16 @@ public class Launch extends Activity implements
 		webView.loadUrl(url);
 	}
 
-	public void fetchRandomImage(View view) {
+	public void fetchRandomImage() {
 		if (sourcesArray.isEmpty()) {
 			showMessage("Please select sources in settings!");
 		} else {
-			progressDialog = ProgressDialog.show(Launch.this, "",
-					"Fetching image..", true);
-			Intent fetchImage = new Intent(Intent.ACTION_VIEW);
-			fetchImage.setClassName(this, WebFetcher.class.getName());
 			nowWatching = sourcesArray.get(0);
-			fetchImage.putExtra("com.grimmvarg.android.pixility.source",
-					nowWatching);
-			fetchImage.putExtra("com.grimmvarg.android.pixility.gifAllowed",
-					allowGif);
+			Intent fetchImage = new Intent(Intent.ACTION_VIEW);
+			progressDialog = ProgressDialog.show(Launch.this, "","Fetching image from " + nowWatching, true);
+			fetchImage.setClassName(this, WebFetcher.class.getName());
+			fetchImage.putExtra("no.brujordet.android.pixility.pixility.source",nowWatching);
+			fetchImage.putExtra("no.brujordet.android.pixility.pixility.gifAllowed",allowGif);
 			Collections.shuffle(sourcesArray);
 
 			startActivityForResult(fetchImage, 1);
@@ -142,12 +135,12 @@ public class Launch extends Activity implements
 		if (resultCode == RESULT_OK && requestCode == 1) {
 			imageURL = data.getExtras().getString("imageURL");
 			setImage(imageURL);
-			((TextView) findViewById(R.id.nowShowing)).setText("Fetched from: "
-					+ nowWatching);
+			((TextView) findViewById(R.id.nowShowing)).setText("Fetched from: " + nowWatching);
 		} else {
 			showMessage("Sry, I failed :( - Try again :D");
 		}
 		progressDialog.dismiss();
+		webView.getSettings().setDefaultZoom(ZoomDensity.MEDIUM);
 	}
 
 	@Override
@@ -193,9 +186,10 @@ public class Launch extends Activity implements
 
 		startActivity(Intent.createChooser(intent, "Share"));
 	}
-	
-	private void restart(){
-		Intent i = getBaseContext().getPackageManager().getLaunchIntentForPackage(getBaseContext().getPackageName());
+
+	private void restart() {
+		Intent i = getBaseContext().getPackageManager()
+				.getLaunchIntentForPackage(getBaseContext().getPackageName());
 		i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(i);
 	}
@@ -205,6 +199,12 @@ public class Launch extends Activity implements
 			String key) {
 		refreshWebSources();
 
+	}
+
+	@Override
+	public void onClick(View v) {
+		fetchRandomImage();
+		
 	}
 
 }
