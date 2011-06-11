@@ -6,7 +6,7 @@
 		android:defaultValue="false"/>
 	<CheckBoxPreference android:key="Fullscreen"
 		android:title="Run in fullscreen" android:summary="More room for pictures"
-		android:defaultValue="false" />
+		android:defaultValue="true" />
 	<PreferenceCategory android:title="Image sources"/>
 	<CheckBoxPreference android:key="Fukung"
 		android:defaultValue="false" android:summary="Use pictures from Fukung"
@@ -20,9 +20,4 @@
 	<CheckBoxPreference android:key="LolRandom"
 		android:title="LolRandom" android:summary="Use pictures from LolRandom"
 		android:defaultValue="false" />
-	<!-- 
-	<CheckBoxPreference android:key="LolPics"
-		android:title="LolPics" android:summary="Use pictures from LolPics"
-		android:defaultValue="false" />
-	-->
 </PreferenceScreen>

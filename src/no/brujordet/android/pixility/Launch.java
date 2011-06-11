@@ -21,8 +21,13 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebSettings.RenderPriority;
 import android.webkit.WebSettings.ZoomDensity;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.ads.AdRequest;
+import com.google.ads.AdSize;
+import com.google.ads.AdView;
 
 public class Launch extends Activity implements OnSharedPreferenceChangeListener, OnClickListener {
 	private WebView webView;
@@ -55,11 +60,17 @@ public class Launch extends Activity implements OnSharedPreferenceChangeListener
 					.restoreState(savedInstanceState);
 		}
 		
-		textView.setOnClickListener(this);
-//		textView.setBackgroundDrawable("#ff000000");
-
+		textView.setOnClickListener(this);;
 		setUpWebView();
+		setUpOurAds();
 
+	}
+
+	private void setUpOurAds() {
+		AdView adView = new AdView(this, AdSize.BANNER, "a14df37d97a7fd9");
+		LinearLayout layout = (LinearLayout) findViewById(R.id.adView);
+		layout.addView(adView);
+		adView.loadAd(new AdRequest());
 	}
 
 	@Override
@@ -101,8 +112,9 @@ public class Launch extends Activity implements OnSharedPreferenceChangeListener
 	private void setUpWebView() {
 		webView = (WebView) findViewById(R.id.webView);
 		webView.setBackgroundColor(0);
-		webView.setDrawingCacheQuality(WebView.DRAWING_CACHE_QUALITY_LOW);
 		webView.setDrawingCacheEnabled(true);
+		webView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+
 		WebView.enablePlatformNotifications();
 		WebSettings webSettings = webView.getSettings();
 		webSettings.setPluginsEnabled(false);
@@ -113,7 +125,8 @@ public class Launch extends Activity implements OnSharedPreferenceChangeListener
 	}
 
 	private void setImage(String url) {
-		webView.loadUrl(url);
+//		webView.loadUrl("<html><body><img src=\"" + url + "\" alt=\"random image\" /></body></html>");
+		webView.loadData("<html><body><img src=\"" + url + "\" alt=\"random image\" /></body></html>","text/html", "utf-8");
 	}
 
 	public void fetchRandomImage() {
@@ -138,12 +151,12 @@ public class Launch extends Activity implements OnSharedPreferenceChangeListener
 		if (resultCode == RESULT_OK && requestCode == 1) {
 			imageURL = data.getExtras().getString("imageURL");
 			setImage(imageURL);
-			((TextView) findViewById(R.id.nowShowing)).setText("Fetched from: " + nowWatching);
+			textView.setText("Fetched from: " + nowWatching);
 		} else {
 			showMessage("Sry, I failed :( - Try again :D");
 		}
 		progressDialog.dismiss();
-		webView.getSettings().setDefaultZoom(ZoomDensity.MEDIUM);
+		//webView.getSettings().setDefaultZoom(ZoomDensity.FAR);
 	}
 
 	@Override
